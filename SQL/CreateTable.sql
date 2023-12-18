@@ -1,0 +1,8 @@
+CREATE TABLE "Guest" (
+	"ID"	INTEGER NOT NULL UNIQUE,
+	"HotelId"	TEXT,
+	"FirstName"	TEXT,
+	"LastName"	TEXT,
+	"RoomNumber"	TEXT,
+	PRIMARY KEY("ID" AUTOINCREMENT)
+);
