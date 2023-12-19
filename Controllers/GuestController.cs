@@ -23,9 +23,9 @@ namespace ivanStojk_CRUD_API.Controllers
     [ApiController]
     public class GuestController : ControllerBase
     {
-        private readonly GuestRepository _guestRepository;
+        private readonly IGuestRepository _guestRepository;
 
-        public GuestController(GuestRepository guestRepository)
+        public GuestController(IGuestRepository guestRepository)
         {
             _guestRepository = guestRepository;
         }
@@ -82,5 +82,38 @@ namespace ivanStojk_CRUD_API.Controllers
                 return NotFound($"Could not find guest with id={id}!");
             }
         }
+        [HttpGet("/room/{str}")]
+        public IActionResult GetGuestByRoomNumber([FromRoute] int str)
+        {
+            var guest = _guestRepository.GetGuestByRoomNumber(str);
+
+            if (guest is null)
+            {
+                return NotFound($"Guest with room number:{str} doesn't exist!");
+            }
+            else
+            {
+                return Ok(guest);
+            }
+        }
+        [HttpPut("{id}")]
+        public ActionResult Put(int id, [FromBody] Guest updatedGuest)
+        {
+            if (updatedGuest == null)
+            {
+                return BadRequest();
+            }
+
+            var existingGuest = _guestRepository.GetSingleGuest(id);
+            if (existingGuest == null)
+            {
+                return NotFound();
+            }
+
+            _guestRepository.UpdateGuest(id, updatedGuest);
+
+            return Ok();
+        }
+
     }
 }
