@@ -16,7 +16,7 @@ using ivanStojk_CRUD_API.Repositories;
 
 namespace ivanStojk_CRUD_API.Repositories
 {
-    public class GuestRepository
+    public class GuestRepository : IGuestRepository
     {
         // List of all guests
         private List<Guest> m_lstGuest;
@@ -37,7 +37,7 @@ namespace ivanStojk_CRUD_API.Repositories
         }
 
         // READ : Get all guest
-        public IEnumerable<Guest> GetAllGuest()
+        public List<Guest> GetAllGuest()
         {
             // Returns entire list 
             return m_lstGuest;
@@ -46,13 +46,13 @@ namespace ivanStojk_CRUD_API.Repositories
         // READ : Get single guest (specified by ID)
         public Guest GetSingleGuest(int id)
         {
-            if (!m_lstGuest.Any(guest => guest.Id == id))
+            if (!m_lstGuest.Any(guest => guest.ID == id))
             {
                 // Checks if any guest matches currently used id, if not returns null
                 return null;
             }
 
-            var guest = m_lstGuest.FirstOrDefault(guest => guest.Id == id);
+            var guest = m_lstGuest.FirstOrDefault(guest => guest.ID == id);
 
             // Checks if guest matches an id, if yes returns that guest
             return guest;
@@ -62,7 +62,7 @@ namespace ivanStojk_CRUD_API.Repositories
         public bool DeleteGuest(int id)
         {
             // Check if guest matches ID
-            var guestToDelete = m_lstGuest.FirstOrDefault(itemGuest => itemGuest.Id == id);
+            var guestToDelete = m_lstGuest.FirstOrDefault(itemGuest => itemGuest.ID == id);
             if (guestToDelete == null)
             {
                 return false;
@@ -70,6 +70,39 @@ namespace ivanStojk_CRUD_API.Repositories
 
             m_lstGuest.Remove(guestToDelete);
 
+            return true;
+        }
+        public Guest GetGuestByRoomNumber(int str)
+        {
+            if (!m_lstGuest.Any(guest => guest.RoomNumber == str))
+            {
+                // Checks if any guest matches currently used id, if not returns null
+                return null;
+            }
+
+            var guest = m_lstGuest.FirstOrDefault(guest => guest.RoomNumber == str);
+
+            // Checks if guest matches an id, if yes returns that guest
+            return guest;
+
+        }
+        public bool UpdateGuest(int id, Guest updatedGuest)
+        {
+
+            Guest? existingGuest = GetSingleGuest(id);
+            if (existingGuest is not null)
+            {
+                // Update only if the user has permission
+                // Implement access control logic as needed
+                existingGuest.HotelId = updatedGuest.HotelId;
+                existingGuest.FirstName = updatedGuest.FirstName;
+                existingGuest.LastName = updatedGuest.LastName;
+                existingGuest.RoomNumber = updatedGuest.RoomNumber;
+            }
+            else
+            {
+                throw new KeyNotFoundException($"Guest with ID '{id}' not found.");
+            }
             return true;
         }
     }
