@@ -55,7 +55,7 @@ namespace ivanStojk_CRUD_API.Repositories
             command.CommandText =
                 @"
                     DELETE FROM Guest
-                    WHERE ID == id";
+                    WHERE ID == $id";
             command.Parameters.AddWithValue("$id", id);
             int rowsAffected = command.ExecuteNonQuery();
             if (rowsAffected < 1)
