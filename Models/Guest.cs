@@ -6,6 +6,7 @@
         public string HotelId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public int RoomNumber { get; set; }
+        public string RoomNumber { get; set; }
+        public DateTime Timestamp { get; set; }
     }
 }

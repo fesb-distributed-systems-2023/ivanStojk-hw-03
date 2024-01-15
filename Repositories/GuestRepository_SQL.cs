@@ -1,14 +1,23 @@
 ﻿
 using Microsoft.Data.Sqlite;
 using ivanStojk_CRUD_API.Models;
+using ivanStojk_CRUD_API.Configuration;
+using Microsoft.Extensions.Options;
 
 
 namespace ivanStojk_CRUD_API.Repositories
 {
     public class GuestRepository_SQL : IGuestRepository
     {
-        private readonly string _connectionString = "Data Source=C:\\Users\\Ivan\\Desktop\\DISlabovi\\ivanStojk-hw-03\\ivanStojk-hw-03\\SQL\\database.db";
-        //private readonly string _dbDatetimeFormat = "yyyy-MM-dd hh:mm:ss.fff";
+        private readonly string _connectionString;
+        private readonly string _dbDatetimeFormat = "yyyy-MM-dd hh:mm:ss.fff";
+
+        public GuestRepository_SQL(IOptions<DBConfiguration> configuration)
+        {
+            _connectionString = configuration.Value.ConnectionString;
+        }
+        
+
 
         public bool CreateNewGuest(Guest guest)
         {
@@ -18,14 +27,14 @@ namespace ivanStojk_CRUD_API.Repositories
             var command = connection.CreateCommand();
             command.CommandText =
             @"
-                INSERT INTO Guest (HotelId, FirstName, LastName, RoomNumber)
-                VALUES ($hotelID, $firstname, $lastname, $roomnumber,)";
+                INSERT INTO Guest (HotelId, FirstName, LastName, RoomNumber, Timestamp)
+                VALUES ($hotelID, $firstname, $lastname, $roomnumber, $timestamp)";
 
             command.Parameters.AddWithValue("$hotelID", guest.HotelId);
-            command.Parameters.AddWithValue("$firstnamw", guest.FirstName);
+            command.Parameters.AddWithValue("$firstname", guest.FirstName);
             command.Parameters.AddWithValue("$lastname", guest.LastName);
             command.Parameters.AddWithValue("$roomnumber", guest.RoomNumber);
-            // probaj dodat command.Parameters.AddWithValue("$timestamp", guest.Timestamp.ToString(_dbDatetimeFormat));
+            command.Parameters.AddWithValue("$timestamp", guest.Timestamp.ToString(_dbDatetimeFormat));
 
             int rowsAffected = command.ExecuteNonQuery();
 
@@ -68,7 +77,7 @@ namespace ivanStojk_CRUD_API.Repositories
 
             var command = connection.CreateCommand();
             command.CommandText =
-            @"SELECT ID, HotelId, FirstName, LastName, RoomNumber FROM Guest";
+            @"SELECT ID, HotelId, FirstName, LastName, RoomNumber, Timestamp FROM Guest";
 
             using var reader = command.ExecuteReader();
 
@@ -82,8 +91,8 @@ namespace ivanStojk_CRUD_API.Repositories
                     HotelId = reader.GetString(1),
                     FirstName = reader.GetString(2),
                     LastName = reader.GetString(3),
-                    RoomNumber = reader.GetInt32(4),
-                    //Timestamp = DateTime.ParseExact(reader.GetString(5), _dbDatetimeFormat, null)
+                    RoomNumber = reader.GetString(4),
+                    Timestamp = DateTime.ParseExact(reader.GetString(5), _dbDatetimeFormat, null)
                 };
 
                 results.Add(row);
@@ -100,7 +109,7 @@ namespace ivanStojk_CRUD_API.Repositories
 
             var command = connection.CreateCommand();
             command.CommandText =
-            @"SELECT ID, HotelId, FirstName, LastName, RoomNumber FROM Guest WHERE ID == $id";
+            @"SELECT ID, HotelId, FirstName, LastName, RoomNumber, Timestamp FROM Guest WHERE ID == $id";
 
             command.Parameters.AddWithValue("$id", id);
 
@@ -116,8 +125,8 @@ namespace ivanStojk_CRUD_API.Repositories
                     HotelId = reader.GetString(1),
                     FirstName = reader.GetString(2),
                     LastName = reader.GetString(3),
-                    RoomNumber = reader.GetInt32(4),
-                    //Timestamp = DateTime.ParseExact(reader.GetString(5), _dbDatetimeFormat, null)
+                    RoomNumber = reader.GetString(4),
+                    Timestamp = DateTime.ParseExact(reader.GetString(5), _dbDatetimeFormat, null)
                 };
 
             }
@@ -125,14 +134,14 @@ namespace ivanStojk_CRUD_API.Repositories
             return result;
         }
 
-        public Guest? GetGuestByRoomNumber(int roomnumber)
+        public Guest? GetGuestByRoomNumber(string roomnumber)
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
 
             var command = connection.CreateCommand();
             command.CommandText =
-            @"SELECT ID, HotelId, FirstName, LastName, RoomNumber FROM Guest WHERE RoomNumber == $roomnumber";
+            @"SELECT ID, HotelId, FirstName, LastName, RoomNumber, Timestamp FROM Guest WHERE RoomNumber == $roomnumber";
 
             command.Parameters.AddWithValue("$roomnumber", roomnumber);
 
@@ -148,15 +157,15 @@ namespace ivanStojk_CRUD_API.Repositories
                     HotelId = reader.GetString(1),
                     FirstName = reader.GetString(2),
                     LastName = reader.GetString(3),
-                    RoomNumber = reader.GetInt32(4),
-                    //Timestamp = DateTime.ParseExact(reader.GetString(5), _dbDatetimeFormat, null)
+                    RoomNumber = reader.GetString(4),
+                    Timestamp = DateTime.ParseExact(reader.GetString(5), _dbDatetimeFormat, null)
                 };
             }
 
             return result;
         }
 
-        public bool UpdateGuest(int id, Guest updatedGuest)
+        public bool UpdateGuest(int id, Guest? updatedGuest)
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
@@ -169,7 +178,8 @@ namespace ivanStojk_CRUD_API.Repositories
                     HotelId = $hotelid,
                     FirstName = $firstname,
                     LastName = $lastname,
-                    RoomNumber = $roomnumber
+                    RoomNumber = $roomnumber,
+                    Timestamp = $timestamp
                 WHERE
                     ID == $id";
 
@@ -178,7 +188,7 @@ namespace ivanStojk_CRUD_API.Repositories
             command.Parameters.AddWithValue("$firstname", updatedGuest.FirstName);
             command.Parameters.AddWithValue("$lastname", updatedGuest.LastName);
             command.Parameters.AddWithValue("$roomnumber", updatedGuest.RoomNumber);
-            //command.Parameters.AddWithValue("$timestamp", updatedGuest.Timestamp.ToString(_dbDatetimeFormat));
+            command.Parameters.AddWithValue("$timestamp", updatedGuest.Timestamp.ToString(_dbDatetimeFormat));
 
             int rowsAffected = command.ExecuteNonQuery();
 
