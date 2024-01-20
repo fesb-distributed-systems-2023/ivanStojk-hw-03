@@ -21,10 +21,8 @@ namespace ivanStojk_CRUD_API.Repositories
         bool DeleteGuest(int id);
         List<Guest> GetAllGuest();
         Guest GetSingleGuest(int id);
-
-        public Guest GetGuestByRoomNumber(int str);
-
-        public bool UpdateGuest(int id, Guest updatedGuest);
+        Guest GetGuestByRoomNumber(string str);
+        bool UpdateGuest(int id, Guest updatedGuest);
 
     }
 }

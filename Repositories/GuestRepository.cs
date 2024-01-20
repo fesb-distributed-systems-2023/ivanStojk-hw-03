@@ -62,17 +62,19 @@ namespace ivanStojk_CRUD_API.Repositories
         public bool DeleteGuest(int id)
         {
             // Check if guest matches ID
-            var guestToDelete = m_lstGuest.FirstOrDefault(itemGuest => itemGuest.ID == id);
-            if (guestToDelete == null)
+            Guest? guestToDelete = GetSingleGuest(id);
+            if (guestToDelete!=null)
             {
+                m_lstGuest.Remove(guestToDelete);
+                return true;
+            }
+            else
+            {
+                throw new KeyNotFoundException($"Guuest with ID '{id}' not found.");
                 return false;
             }
-
-            m_lstGuest.Remove(guestToDelete);
-
-            return true;
         }
-        public Guest GetGuestByRoomNumber(int str)
+        public Guest GetGuestByRoomNumber(string str)
         {
             if (!m_lstGuest.Any(guest => guest.RoomNumber == str))
             {
